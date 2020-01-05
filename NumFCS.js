@@ -204,6 +204,34 @@
             }
         }
     };
+    
+    $.fn.numfcs = function (val, decimals, thousands_sep, dec_point)
+    {
+        $(this)
+        .each(function(){
+            var _decimals = decimals || $(this).data('decimals') || 2,
+                _thousands_sep = thousands_sep || $(this).data('thousands_sep') || ',',
+                _dec_point = dec_point || $(this).data('thousands_sep') || '.';
+
+            $(this)
+            .data('toggle', 'numfcs')
+            .data('decimals', _decimals)
+            .data('thousands_sep', _thousands_sep)
+            .data('dec_point', _dec_point)
+            ;
+
+            if (val)
+            {
+                $(this).val(val);
+            }
+
+            if (this.value !== '') 
+            {
+                _input(null, this);
+            }
+        });
+    }
+        
 
     $(document).ready(function() {
         $('[data-toggle="numfcs"]')
