@@ -27,7 +27,7 @@
 }(function ($) {
 
     var _keydown = function(e) {
-        if (e.key === 'ArrowLeft' && !e.shiftKey) {
+        if (e.key === 'ArrowLeft' && !e.shiftKey && this.type !== 'number') {
             e.preventDefault();
             e.stopImmediatePropagation();
             return false;
