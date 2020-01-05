@@ -47,9 +47,9 @@
     var _input = function(e, el) {
         var _this = el || this;
 
-        var decimals = $(_this).data('decimals') || 2,
-            thousands_sep = $(_this).data('thousands_sep') || ',',
-            dec_point = $(_this).data('thousands_sep') || '.';
+        var decimals = typeof $(_this).data('decimals') === 'undefined' ? 2 : $(_this).data('decimals'),
+            thousands_sep = typeof $(_this).data('thousands_sep') === 'undefined' ? (_this.type === 'number' ? '' : ',') : $(_this).data('thousands_sep'),
+            dec_point = typeof $(_this).data('dec_point') === 'undefined' ? '.' : $(_this).data('dec_point');
 
         var data = $(_this).data('numfcs') || [];
 
@@ -122,7 +122,7 @@
     var _output = function(e, el) {
         var _this = el || this;
 
-        var decimals = $(_this).data('decimals') || 2;
+        var decimals = typeof $(_this).data('decimals') === 'undefined' ? 2 : $(_this).data('decimals');
 
         var data = $(_this).data('numfcs');
 
@@ -205,16 +205,16 @@
         }
     };
     
-    $.fn.numfcs = function (val, decimals, thousands_sep, dec_point)
+    $.fn.numfcs = function (val, decimals, dec_point, thousands_sep)
     {
         $(this)
         .each(function(){
-            var _decimals = decimals || $(this).data('decimals') || 2,
-                _thousands_sep = thousands_sep || $(this).data('thousands_sep') || ',',
-                _dec_point = dec_point || $(this).data('thousands_sep') || '.';
+        	var _decimals = typeof decimals !== 'undefined' ? decimals : (typeof $(this).data('decimals') === 'undefined' ? 2 : $(this).data('decimals')),
+            	_thousands_sep = typeof thousands_sep !== 'undefined' ? thousands_sep : (typeof $(this).data('thousands_sep') === 'undefined' ? (this.type === 'number' ? '' : ',') : $(this).data('thousands_sep')),
+            	_dec_point = typeof dec_point !== 'undefined' ? dec_point : (typeof $(this).data('dec_point') === 'undefined' ? '.' : $(this).data('dec_point'));
 
             $(this)
-            .data('toggle', 'numfcs')
+            .attr('data-toggle', 'numfcs')
             .data('decimals', _decimals)
             .data('thousands_sep', _thousands_sep)
             .data('dec_point', _dec_point)
