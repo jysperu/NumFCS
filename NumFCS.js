@@ -120,7 +120,7 @@
             {
                 data[0] = y;
             }
-            else if (/[0-9]/i.test(y))
+            else if (/^[0-9]+$/i.test(y))
             {
                 data.push(y * 1);
             }
