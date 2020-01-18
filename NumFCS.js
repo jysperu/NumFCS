@@ -308,7 +308,7 @@
             val += '.' + ndecimales;
         }
 
-        return parseFloat(val);
+        return parseFloat(val).toString();
     };
 
     $(document)
