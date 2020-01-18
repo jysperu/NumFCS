@@ -62,6 +62,72 @@
         } catch (x) {}
     };
 
+	var _force_dec = function (val, decimals)
+    {
+    	if (val === null || val === true || val === false || typeof val === 'undefined')
+        {
+            val = 0;
+        }
+
+    	if (typeof decimals === 'undefined')
+        {
+        	decimals = 2;
+        }
+
+        val = val.toString();
+
+        var negative = /\-/gi.test(val);
+
+        val = (negative ? '-' : '') + val.replace(/[^0-9\.]/gi, '');
+
+        if ( ! (/\./gi.test(val)))
+       	{
+        	val += '.';
+        }
+        
+        var val_ = val.split('.', 2),
+        	entero = val_[0],
+            decimal = val_[1].replace(/\./gi, '');
+        
+		if (/[1-9]+[0]+[1-9]$/gi.test(decimal))
+        {
+        	decimal = decimal.replace(/([1-9]+)[0]+[1-9]$/gi, '$1');
+        }
+        else if (/[0-8]+[9]+[1-9]$/gi.test(decimal))
+        {
+        	decimal = decimal.replace(/([0-8]+)[9]+[1-9]$/gi, '$1');
+            decimal = decimal.replace(/[0-8]$/gi, val[val.length-1]*1+1);
+        }
+
+        if (decimals < decimal.length)
+        {
+        	val = entero + '.' + decimal;
+
+        	var k = '1';
+            for(ki = 1; ki <= decimals; ki++)
+            {
+            	k+= '0';
+            }
+            k = k*1;
+
+			val = Math.round(val*k) / k;
+
+			val = val.toString();
+            val_ = val.split('.', 2);
+            entero = val_[0];
+            decimal = val_[1];
+        }
+        
+		while (decimals > decimal.length)
+        {
+        	decimal += '0';
+        }
+        
+        val = entero + '.' + decimal;
+
+        return val;
+    };
+
 	var _stringify = function (val, decimals, dec_point, thousands_sep, data)
     {
     	if (val === null || val === true || val === false || typeof val === 'undefined')
@@ -279,7 +345,8 @@
         var _this = el;
 
         if ($(_this).data('toggle') === 'numfcs') {
-            _this.value = val;
+        	var _decimals = typeof $(_this).data('decimals') === 'undefined' ? 2 : $(_this).data('decimals');
+            _this.value = _force_dec(val, _decimals);
             return _input(null, el);
         } else {
             if ($.isFunction(origHookSet)) {
@@ -291,7 +358,7 @@
             }
         }
     };
-    
+
     $.fn.numfcs = $.fn.number2 = function (val, decimals, dec_point, thousands_sep)
     {
         $(this)
@@ -309,11 +376,13 @@
 
             if (val !== null && val !== true && val !== false && typeof val !== 'undefined')
             {
+            	val = _force_dec(val, _decimals);
                 $(this).val(val);
             }
 
             if (this.value !== '') 
             {
+            	this.value = _force_dec(this.value, _decimals);
                 _input(null, this);
             }
         });
@@ -328,13 +397,18 @@
 
 	if ( ! $.number)
     {
-    	$.number = _stringify;
+    	$.number = function (val, decimals, dec_point, thousands_sep)
+        {
+        	val = _force_dec(val, decimals);
+        	return _stringify(val, decimals, dec_point, thousands_sep);
+        };
     }
 
     $(document).ready(function() {
         $('[data-toggle="numfcs"]')
             .each(function() {
                 if (this.value !== '') {
+                	this.value = _force_dec(this.value, _decimals);
                     _input(null, this);
                 }
             })
