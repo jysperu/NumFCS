@@ -32,16 +32,155 @@
             e.stopImmediatePropagation();
             return false;
         }
+        
+        if (e.key === '.')
+        {
+        	var decimals = typeof $(this).data('decimals') === 'undefined' ? 2 : $(this).data('decimals');
+            for (var i = 0; i < decimals; i++) 
+            {
+        		this.value += '0';
+            }
+        }
     };
 
     var _selectionEndReparo = function(e) {
-        if (e.shiftKey || e.ctrlKey || e.key === 'Shift' || e.key === 'Control') {
+    	if (e.shiftKey || e.ctrlKey || e.key === 'Shift' || e.key === 'Control') {
             return;
         }
 
         try {
-            this.selectionStart = this.selectionEnd = this.value.length;
+        	if (e.key === '.')
+        	{
+        	    var decimals = typeof $(this).data('decimals') === 'undefined' ? 2 : $(this).data('decimals');
+        	    this.selectionStart = this.value.length - decimals;
+                this.selectionEnd = this.value.length - decimals + 1;
+        	}
+            else
+            {
+            	this.selectionStart = this.selectionEnd = this.value.length;
+            }
         } catch (x) {}
+    };
+
+	var _stringify = function (val, decimals, dec_point, thousands_sep, data)
+    {
+    	if (val === null || val === true || val === false || typeof val === 'undefined')
+        {
+            val = 0;
+        }
+
+    	if (typeof decimals === 'undefined')
+        {
+        	decimals = 2;
+        }
+        
+    	if (typeof dec_point === 'undefined')
+        {
+        	dec_point = '.';
+        }
+        
+    	if (typeof thousands_sep === 'undefined')
+        {
+        	thousands_sep = ',';
+        }
+        
+    	if (typeof data === 'undefined')
+        {
+        	data = [];
+        }
+        
+        // limpiando data
+        var dl = data.length;
+        if (dl > 0)
+        {
+        	for (var di = 0; di < dl; di++) 
+        	{
+        	    data.shift();
+        	}
+        }
+        
+        // añadiendo signo por defecto
+    	data.push('+');
+
+		// añadiendo entero por defecto
+        data.push(0);
+        
+        // añadiendo decimal por defecto
+        for (var i = 0; i < decimals; i++) 
+        {
+            data.push(0);
+        }
+
+		// añadiendo caracteres del valor
+        val = val.toString();
+        for (var x in val) 
+        {
+            var y = val[x];
+            if (y === '+' || y === '-') 
+            {
+                data[0] = y;
+            }
+            else if (/[0-9]/i.test(y))
+            {
+                data.push(y * 1);
+            }
+        }
+
+		// reseteando el valor
+		val = '';
+        
+        // añadiendo signo solo si es negativo
+        if (data[0] === '-') 
+        {
+            val += '-';
+        }
+
+        // generando la parte entera y decimal
+        var nentero = '',
+            ndecimales = '',
+            indec = false;
+
+        for (var ix = 1; ix < data.length; ix++) {
+            indec = (data.length - ix) <= decimals;
+
+            if (indec) 
+            {
+                ndecimales += data[ix];
+            } 
+            else 
+            {
+                nentero += data[ix];
+            }
+        }
+
+		// quitando ceros de la izquierda del entero
+        nentero = (nentero * 1) + '';
+        
+        // formateando el caracter de los miles en el entero
+        var nentero_length = nentero.length,
+            nentero_sep = (nentero_length % 3) + 1,
+            nentero_string = '';
+
+        for (var nentero_ind = 0; nentero_ind < nentero_length; nentero_ind++)
+        {
+            nentero_sep--;
+            if (nentero_sep <= 0) 
+            {
+                nentero_sep = 3;
+            }
+
+            if (nentero_ind > 0 && nentero_sep === 3) 
+            {
+                nentero_string += thousands_sep;
+            }
+
+            nentero_string += nentero[nentero_ind];
+        }
+
+		// generando el nuevo valor formateado
+        val += nentero_string + dec_point + (ndecimales);
+
+		return val;
     };
 
     var _input = function(e, el) {
@@ -51,65 +190,13 @@
             thousands_sep = typeof $(_this).data('thousands_sep') === 'undefined' ? (_this.type === 'number' ? '' : ',') : $(_this).data('thousands_sep'),
             dec_point = typeof $(_this).data('dec_point') === 'undefined' ? '.' : $(_this).data('dec_point');
 
-        var data = $(_this).data('numfcs') || [];
+        var data = $(_this).data('numfcs') || [],
+        	val  = _this.value;
 
-        var val = _this.value;
-        data = ['+'];
+        val = _stringify (val, decimals, dec_point, thousands_sep, data);
 
-        for (var i = 0; i < decimals; i++) {
-            data.push(0);
-        }
-        data.push(0);
-
-        for (var x in val) {
-            var y = val[x];
-            if (y === '+' || y === '-') {
-                data[0] = y;
-            } else if (/[0-9]/i.test(y)) {
-                data.push(y * 1);
-            }
-        }
-
-        val = '';
-        if (data[0] === '-') {
-            val += '-';
-        }
-
-        var nentero = '',
-            ndecimales = '',
-            indec = false;
-
-        for (var ix = 1; ix < data.length; ix++) {
-            indec = (data.length - ix) <= decimals;
-
-            if (indec) {
-                ndecimales += data[ix];
-            } else {
-                nentero += data[ix];
-            }
-        }
-
-        nentero = (nentero * 1) + '';
-        var nentero_length = nentero.length,
-            nentero_sep = (nentero_length % 3) + 1,
-            nentero_string = '';
-
-        for (var nentero_ind = 0; nentero_ind < nentero_length; nentero_ind++) {
-            nentero_sep--;
-            if (nentero_sep <= 0) {
-                nentero_sep = 3;
-            }
-
-            if (nentero_ind > 0 && nentero_sep === 3) {
-                nentero_string += thousands_sep;
-            }
-
-            nentero_string += nentero[nentero_ind];
-        }
-
-        val += nentero_string + dec_point + (ndecimales);
-
-        if (e && e.originalEvent && e.originalEvent.inputType && /delete/i.test(e.originalEvent.inputType) && val === '0.00') {
+		if (e && e.originalEvent && e.originalEvent.inputType && /delete/i.test(e.originalEvent.inputType) && val === '0.00') 
+        {
             val = '';
         }
 
@@ -205,7 +292,7 @@
         }
     };
     
-    $.fn.numfcs = function (val, decimals, dec_point, thousands_sep)
+    $.fn.numfcs = $.fn.number2 = function (val, decimals, dec_point, thousands_sep)
     {
         $(this)
         .each(function(){
@@ -220,7 +307,7 @@
             .data('dec_point', _dec_point)
             ;
 
-            if (val)
+            if (val !== null && val !== true && val !== false && typeof val !== 'undefined')
             {
                 $(this).val(val);
             }
@@ -230,8 +317,19 @@
                 _input(null, this);
             }
         });
-    }
         
+        return $(this);
+    }
+
+	if ( ! $.fn.number)
+    {
+    	$.fn.number = $.fn.numfcs;
+    }
+
+	if ( ! $.number)
+    {
+    	$.number = _stringify;
+    }
 
     $(document).ready(function() {
         $('[data-toggle="numfcs"]')
