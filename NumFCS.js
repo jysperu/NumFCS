@@ -117,8 +117,13 @@
             entero = val_[0];
             decimal = val_[1];
         }
-        
-		while (decimals > decimal.length)
+
+	if (typeof decimal === 'undefined')
+	{
+		decimal = '';
+	}
+
+	while (decimals > decimal.length)
         {
         	decimal += '0';
         }
