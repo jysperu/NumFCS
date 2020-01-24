@@ -96,7 +96,7 @@
         else if (/[0-8]+[9]+[1-9]$/gi.test(decimal))
         {
         	decimal = decimal.replace(/([0-8]+)[9]+[1-9]$/gi, '$1');
-            decimal = decimal.replace(/[0-8]$/gi, val[val.length-1]*1+1);
+            decimal = decimal.replace(/[0-8]$/gi, decimal[decimal.length-1]*1+1);
         }
 
         if (decimals < decimal.length)
