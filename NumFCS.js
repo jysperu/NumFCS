@@ -93,6 +93,11 @@
         {
         	decimal = decimal.replace(/([1-9]+)[0]+[1-9]$/gi, '$1');
         }
+        else if (/^[9]+[1-9]$/gi.test(decimal))
+        {
+		entero++;
+        	decimal = 0;
+        }
         else if (/[0-8]+[9]+[1-9]$/gi.test(decimal))
         {
         	decimal = decimal.replace(/([0-8]+)[9]+[1-9]$/gi, '$1');
