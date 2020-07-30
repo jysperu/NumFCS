@@ -62,81 +62,68 @@
         } catch (x) {}
     };
 
-	var _force_dec = function (val, decimals)
-    {
-    	if (val === null || val === true || val === false || typeof val === 'undefined')
-        {
-            val = 0;
-        }
+  var _force_dec = function(val, decimals) {
+      if (val === null || val === true || val === false || typeof val === 'undefined') {
+          val = 0;
+      }
 
-    	if (typeof decimals === 'undefined')
-        {
-        	decimals = 2;
-        }
+      if (typeof decimals === 'undefined') {
+          decimals = 2;
+      }
 
-        val = val.toString();
+      val = val.toString();
 
-        var negative = /\-/gi.test(val);
+      var negative = /\-/gi.test(val);
 
-        val = (negative ? '-' : '') + val.replace(/[^0-9\.]/gi, '');
+      val = (negative ? '-' : '') + val.replace(/[^0-9\.]/gi, '');
 
-        if ( ! (/\./gi.test(val)))
-       	{
-        	val += '.';
-        }
-        
-        var val_ = val.split('.', 2),
-        	entero = val_[0],
-            decimal = val_[1].replace(/\./gi, '');
-        
-		if (/[1-9]+[0]+[1-9]$/gi.test(decimal))
-        {
-        	decimal = decimal.replace(/([1-9]+)[0]+[1-9]$/gi, '$1');
-        }
-        else if (/^[9]+[1-9]$/gi.test(decimal))
-        {
-		entero++;
-        	decimal = 0;
-        }
-        else if (/[0-8]+[9]+[1-9]$/gi.test(decimal))
-        {
-        	decimal = decimal.replace(/([0-8]+)[9]+[1-9]$/gi, '$1');
-            decimal = decimal.replace(/[0-8]$/gi, decimal[decimal.length-1]*1+1);
-        }
+      if (!(/\./gi.test(val))) {
+          val += '.';
+      }
 
-        if (decimals < decimal.length)
-        {
-        	val = entero + '.' + decimal;
+      var val_ = val.split('.', 2),
+          entero = val_[0],
+          decimal = val_[1].replace(/\./gi, '');
 
-        	var k = '1';
-            for(ki = 1; ki <= decimals; ki++)
-            {
-            	k+= '0';
-            }
-            k = k*1;
+      if (/[1-9]+[0]+[1-9]$/gi.test(decimal)) {
+          decimal = decimal.replace(/([1-9]+)[0]+[1-9]$/gi, '$1');
+      } else if (/^[9]+[1-9]$/gi.test(decimal)) {
+          entero++;
+          decimal = 0;
+      } else if (/[0-8]+[9]+[1-9]$/gi.test(decimal)) {
+          decimal = decimal.replace(/([0-8]+)[9]+[1-9]$/gi, '$1');
+          decimal = decimal.replace(/[0-8]$/gi, decimal[decimal.length - 1] * 1 + 1);
+      }
 
-			val = Math.round(val*k) / k;
+      if (decimals < decimal.length) {
+          val = entero + '.' + decimal;
 
-			val = val.toString();
-            val_ = val.split('.', 2);
-            entero = val_[0];
-            decimal = val_[1];
-        }
+          var k = '1';
+          for (ki = 1; ki <= decimals; ki++) {
+              k += '0';
+          }
+          k = k * 1;
 
-	if (typeof decimal === 'undefined')
-	{
-		decimal = '';
-	}
+          val = Math.round(val * k) / k;
 
-	while (decimals > decimal.length)
-        {
-        	decimal += '0';
-        }
-        
-        val = entero + '.' + decimal;
+          val = val.toString();
+          val_ = val.split('.', 2);
+          entero = val_[0];
+          decimal = val_[1];
+      }
 
-        return val;
-    };
+      if (typeof decimal === 'undefined') {
+          decimal = '';
+      }
+
+      while (decimals > decimal.length) {
+          decimal += '0';
+      }
+
+      val = entero + '.' + decimal;
+
+      return val;
+  };
 
 	var _stringify = function (val, decimals, dec_point, thousands_sep, data)
     {
