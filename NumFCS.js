@@ -85,12 +85,12 @@
           entero = val_[0],
           decimal = val_[1].replace(/\./gi, '');
 
-      if (/[1-9]+[0]+[1-9]$/gi.test(decimal)) {
+      if (/[1-9]+[0]{2,}[1-9]$/gi.test(decimal)) {
           decimal = decimal.replace(/([1-9]+)[0]+[1-9]$/gi, '$1');
-      } else if (/^[9]+[1-9]$/gi.test(decimal)) {
+      } else if (/^[9]{2,}[1-9]$/gi.test(decimal)) {
           entero++;
           decimal = 0;
-      } else if (/[0-8]+[9]+[1-9]$/gi.test(decimal)) {
+      } else if (/[0-8]+[9]{2,}[1-9]$/gi.test(decimal)) {
           decimal = decimal.replace(/([0-8]+)[9]+[1-9]$/gi, '$1');
           decimal = decimal.replace(/[0-8]$/gi, decimal[decimal.length - 1] * 1 + 1);
       }
